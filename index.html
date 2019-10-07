@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Incremental Game made for Ld45 2019</title>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="author" content="Luke Nickerson">
+	<link rel="stylesheet" href="clicker.css" />
+</head>
+<body scroll="no">
+<main>
+	<article class="leader">
+		<header>
+			<h1 class="edit edit-leader-name">👤 <span class="leader-name">You</span></h1>
+		</header>
+		<section class="inventory">
+			<h1>Inventory</h1>
+			<div class="nothing">You have nothing!</div>
+			<dl class="inventory-list">
+				<div class="locked" data-unlock="{'food-value': 1}">
+					<dt>🍓Food</dt><dd class="food-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'wood-value': 1}">
+					<dt>🌳Wood</dt><dd class="wood-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'stone-value': 1}">
+					<dt>🧱Stone</dt><dd class="stone-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'ore-value': 1}">
+					<dt>🔩Ore</dt><dd class="ore-value"></dd>
+				</div>
+			</dl>
+			<div class="locked" data-unlock="{'food-value': 50}">
+				<select class="donate-what">
+					<option value="food">Food</option>
+					<option value="wood">Wood</option>
+					<option value="stone">Stone</option>
+					<option value="ore">Ore</option>
+				</select>
+				<button class="donate">Drop/Donate</button>
+			</div>
+		</section>
+		<section class="actions">
+			<h1>Actions</h1>
+			<button class="eat">🦷Eat</button>
+			<button class="forage">🍓Forage</button>
+			<button class="gather-wood locked" data-unlock="{'fullness-value':99}">🌳Gather Wood</button>
+			<button class="chop-wood locked" data-unlock="{'lumbering-value':100}">🌲Chop Wood</button>
+			<button class="mine-stone locked" data-unlock="{'lumbering-value':120}">⚒⛰Mine Stone</button>
+			<button class="mine-ore locked" data-unlock="{'mining-value':100}">⛏⛰Mine Ore</button>
+			<button class="meditate locked" data-unlock="{'survivalism-value': 50}">📿Meditate</button>
+			<button class="experiment locked" data-unlock="{'enlightenment-value':100}">🧠Experiment</button>
+			<button class="build-tent locked" data-unlock="{'survivalism-value': 50, 'science-value': 10}" data-cost="{'wood-value': 10}">🏕Build Tent</button>
+			<button class="build-hut locked" data-unlock="{'building-value': 10, 'science-value': 50}">🧱Build Hut</button>
+			<button class="build-house locked" data-unlock="{'building-value': 50, 'science-value': 75}">🏠Build House</button>
+			<button class="build-farm locked" data-unlock="{'building-value': 10, 'science-value': 60}">🌱Build Farm</button>
+		</section>
+		<section class="skills locked" data-unlock="{'survivalism-value': 10}">
+			<h1>Skills</h1>
+			<dl>
+				<div class="locked" data-unlock="{'building-value': 1}">
+					<dt>Building</dt><dd class="building-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'enlightenment-value': 1}">
+					<dt>Enlightenment</dt><dd class="enlightenment-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'lumbering-value': 1}">
+					<dt>Lumbering</dt><dd class="lumbering-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'mining-value': 1}">
+						<dt>Mining</dt><dd class="mining-value"></dd>
+					</div>
+				<div class="locked" data-unlock="{'science-value': 1}">
+					<dt>Science</dt><dd class="science-value"></dd>
+				</div>
+				<div class="locked" data-unlock="{'survivalism-value': 1}">
+					<dt>Survivalism</dt><dd class="survivalism-value"></dd>
+				</div>
+			</dl>
+		</section>
+		<section class="stats locked" data-unlock="{'enlightenment-value': 5}">
+			<dl>
+				<dt>Age</dt><dd class="age-value"></dd>
+				<dt>Fullness</dt><dd class="fullness-value"></dd>
+					<dd class="fullness-warning"></dd>
+			</dl>
+		</section>
+	</article>
+	<article class="location locked" data-unlock="{'enlightenment-value': 20}">
+		<header>
+			<h1 class="edit edit-location-name">🌄<span class="location-name"></span></h1>
+		</header>
+		<section>
+			<h1>Community Items</h1>
+			<dl>
+				<div class="locked" data-unlock="{'community-food': 1}">
+					<dt>🍓Food</dt><dd class="community-food"></dd>
+				</div>
+				<div class="locked" data-unlock="{'community-wood': 1}">
+					<dt>🌳Wood</dt><dd class="community-wood"></dd>
+				</div>
+				<div class="locked" data-unlock="{'community-stone': 1}">
+					<dt>🧱Stone</dt><dd class="community-stone"></dd>
+				</div>
+				<div class="locked" data-unlock="{'community-ore': 1}">
+					<dt>🔩Ore</dt><dd class="community-ore"></dd>
+				</div>
+			</dl>
+		</section>
+		<section>
+			<h1>Buildings</h1>
+			<dl>
+				<dt>Used space</dt><dd class="used-space"></dd>
+				<dt>Free space</dt><dd class="free-space"></dd>
+			</dl>
+			<dl>
+				<div class="" data-unlock="{}">
+					<dt>Tents</dt><dd class="tents"></dd>
+					<dt>Huts</dt><dd class="huts"></dd>
+					<dt>Houses</dt><dd class="houses"></dd>
+					<dt>Farms</dt><dd class="farms"></dd>
+					<dt>Temples</dt><dd class="temples"></dd>
+				</div>
+			</dl>
+		</section>
+		<section class="locked" data-unlock="{'pop-total': 1}">
+			<h1>Population: <span class="pop-total"></span></h1>
+			<dl>
+				<dt>Hobos</dt><dd class="pop-hobos"></dd>
+			</dl>
+		</section>
+	</article>
+</main>
+<div>
+	<script src="Dome.js" type="module"></script>
+	<script src="Leader.js" type="module"></script>
+	<script src="Location.js" type="module"></script>
+	<script src="Loop.js" type="module"></script>
+	<script src="game.js" type="module"></script>
+</div>
+</body>
+</html>
