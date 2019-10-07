@@ -1,8 +1,8 @@
 class Leader {
 	constructor() {
 		this.name = 'You';
-		this.hand1 = {};
-		this.hand2 = {};
+		// this.hand1 = null;
+		// this.hand2 = null;
 		this.age = 18;
 		this.ageRate = 1/100;
 		this.fullness = 50;
@@ -17,11 +17,8 @@ class Leader {
 			science: 0,
 			survivalism: 0,
 		};
+		this.base = 1;
 	}
-	// isHandFree(n) {
-	// 	const handKeys = Object.keys(this[`hand${n}`]);
-	// 	return (handKeys.length === 0);
-	// }
 	older(t) {
 		this.age += (this.ageRate * t);
 		if (this.fullness < 30) {
@@ -44,41 +41,33 @@ class Leader {
 		this.eating = true;
 	}
 	meditate() {
-		this.skills.enlightenment += 10;
+		this.skills.enlightenment += this.base;
 	}
 	experiment() {
-		this.skills.science += 10;
+		this.skills.science += this.base;
 	}
 	forage() {
-		// let hand;
-		// if (this.isHandFree(1) || typeof this.hand1.food === 'number') {
-		// 	hand = this.hand1;
-		// } else if (this.isHandFree(1) || typeof this.hand1.food === 'number') {
-		// 	hand = this.hand2;
-		// }
-		// if (!hand) { return false; }
-		// hand.food = (hand.food || 0) + 1;
-		this.give('food', 55);
-		this.skills.survivalism += 55;
+		this.give('food', this.base);
+		this.skills.survivalism += this.base;
 	}
 	gatherWood() {
-		this.give('wood', 55);
-		this.skills.lumbering += 55;
+		this.give('wood', this.base);
+		this.skills.lumbering += this.base;
 	}
 	chopWood() {
-		this.give('wood', 2);
-		this.skills.lumbering += 55;
+		this.give('wood', 2 * this.base);
+		this.skills.lumbering += this.base;
 	}
 	mineStone() {
-		this.give('stone', 55);
-		this.skills.mining += 55;
+		this.give('stone', this.base);
+		this.skills.mining += this.base;
 	}
 	mineOre() {
-		this.give('ore', 55);
-		this.skills.mining += 55;
+		this.give('ore', this.base);
+		this.skills.mining += this.base;
 	}
 	build(what) {
-		this.skills.building += 1;
+		this.skills.building += this.base;
 	}
 	give(what, amount) {
 		this.inventory[what] = (this.inventory[what] || 0) + amount;
