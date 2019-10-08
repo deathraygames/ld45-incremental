@@ -10,9 +10,19 @@ class Location {
 			farm: {food: 50, wood: 100} 
 		};
 		this.buildings = {};
-		this.population = {
-			hobo: 0
+		this.capacities = {
+			tent: 1,
+			hut: 2,
+			house: 4,
+			farm: 4,
 		};
+		this.population = {
+			hobo: 0,
+			forager: 0,
+			farmer: 0,
+		};
+		this.eatRate = 0.6;
+		this.immigrationRate = 0.1;
 	}
 	give(what, amount) {
 		this.inventory[what] = (this.inventory[what] || 0) + amount;
@@ -42,15 +52,48 @@ class Location {
 		return this.requirements[what];
 	}
 	older(t) {
+		const pop = this.getPopulationTotal();
 		if (this.inventory.food > 0) {
-			this.inventory.food -= t * this.getPopulationTotal();
+			this.inventory.food -= t * this.eatRate * pop;
 		}
-		if (this.inventory.food > 100) {
+		if (this.inventory.food > 100 && this.inventory.food > (pop * 50)) {
 			this.immigration(t);
 		}
+		this.work(t);
 	}
 	immigration(t) {
-		this.population.hobo += (t / 10);
+		this.population.hobo += t * this.immigrationRate;
+	}
+	work(t) {
+		const foodEarned = t * ((this.population.forager * 0.5) + (this.population.farmer * 1));
+		const woodEarned = t * ((this.population.forager * 0.5));
+		this.give('food', foodEarned);
+		this.give('wood', woodEarned);
+	}
+	getRandomJob() {
+		const jobs = Object.keys(this.population);
+		const i = Math.ceil(Math.random() * jobs.length) - 1;
+		return jobs[i];
+	}
+	rejob() {
+		let oldJob;
+		if (this.population.hobo >= 1) {
+			oldJob = 'hobo';
+		} else {
+			oldJob = this.getRandomJob();
+			if (this.population[oldJob] < 1) { oldJob = null; }
+		}
+		if (!oldJob) { return false; }
+
+		const newJob = this.getRandomJob();
+		if (newJob === 'farmer' && this.population.farmer >= this.capacities.farm * this.buildings.farm) {
+			return false;
+		}
+		this.rejobFromTo(oldJob, newJob);
+	}
+	rejobFromTo(fromJob, toJob) {
+		this.population[toJob] += 1;
+		this.population[fromJob] -= 1;		
 	}
 	getPopulationTotal() {
 		const keys = Object.keys(this.population);

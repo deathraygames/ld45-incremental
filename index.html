@@ -6,6 +6,7 @@
 	<meta name="description" content="">
 	<meta name="author" content="Luke Nickerson">
 	<link rel="stylesheet" href="clicker.css" />
+	<meta name="viewport" content="width=device-width">
 </head>
 <body scroll="no">
 <main>
@@ -42,8 +43,9 @@
 		</section>
 		<section class="actions">
 			<h1>Actions</h1>
-			<button class="eat">🦷Eat</button>
+			<button class="eat locked" data-unlock="{'food-value': 2}">🦷Eat</button>
 			<button class="forage">🍓Forage</button>
+			<button class="farm locked" data-unlock="{'farms': 1}">🌾Farm</button>
 			<button class="gather-wood locked" data-unlock="{'survivalism-value':50}">🌳Gather Wood</button>
 			<button class="chop-wood locked" data-unlock="{'lumbering-value':100}">🌲Chop Wood</button>
 			<button class="mine-stone locked" data-unlock="{'lumbering-value':120}">⚒⛰Mine Stone</button>
@@ -55,7 +57,7 @@
 			<button class="build-house locked" data-unlock="{'building-value': 50, 'science-value': 75}">🏠Build House</button>
 			<button class="build-farm locked" data-unlock="{'building-value': 10, 'science-value': 60}">🌱Build Farm</button>
 		</section>
-		<section class="skills locked" data-unlock="{'survivalism-value': 10}">
+		<section class="skills locked" data-unlock="{'survivalism-value': 20}">
 			<h1>Skills</h1>
 			<dl>
 				<div class="locked" data-unlock="{'building-value': 1}">
@@ -78,11 +80,15 @@
 				</div>
 			</dl>
 		</section>
-		<section class="stats locked" data-unlock="{'enlightenment-value': 5}">
+		<section class="stats locked" data-unlock="{'food-value': 10}">
 			<dl>
-				<dt>Age</dt><dd class="age-value"></dd>
-				<dt>Fullness</dt><dd class="fullness-value"></dd>
-					<dd class="fullness-warning"></dd>
+				<div class="locked" data-unlock="{'enlightenment-value': 50}">
+					<dt>Age</dt><dd class="age-value"></dd>
+				</div>
+				<div>
+					<dt>Fullness</dt><dd class="fullness-value"></dd>
+						<dd class="fullness-warning"></dd>
+				</div>
 			</dl>
 		</section>
 	</article>
@@ -115,18 +121,20 @@
 			</dl>
 			<dl>
 				<div class="" data-unlock="{}">
-					<dt>Tents</dt><dd class="tents"></dd>
-					<dt>Huts</dt><dd class="huts"></dd>
-					<dt>Houses</dt><dd class="houses"></dd>
-					<dt>Farms</dt><dd class="farms"></dd>
-					<dt>Temples</dt><dd class="temples"></dd>
+					<div><dt>Tents</dt><dd class="tents"></dd></div>
+					<div><dt>Huts</dt><dd class="huts"></dd></div>
+					<div><dt>Houses</dt><dd class="houses"></dd></div>
+					<div><dt>Farms</dt><dd class="farms"></dd></div>
+					<div><dt>Temples</dt><dd class="temples"></dd></div>
 				</div>
 			</dl>
 		</section>
 		<section class="locked" data-unlock="{'pop-total': 1}">
 			<h1>Population: <span class="pop-total"></span></h1>
 			<dl>
-				<dt>Hobos</dt><dd class="pop-hobos"></dd>
+				<div><dt>Hobos</dt><dd class="pop-hobo"></dd></div>
+				<div><dt>Foragers</dt><dd class="pop-forager"></dd></div>
+				<div><dt>Farmers</dt><dd class="pop-farmer"></dd></div>
 			</dl>
 		</section>
 	</article>

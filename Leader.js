@@ -6,18 +6,19 @@ class Leader {
 		this.age = 18;
 		this.ageRate = 1/100;
 		this.fullness = 50;
-		this.fullnessRate = -1;
+		this.fullnessRate = -0.5;
 		this.inventory = {};
 		this.eating = false;
 		this.skills = {
 			building: 0,
 			enlightenment: 0,
+			farming: 0,
 			lumbering: 0,
 			mining: 0,
 			science: 0,
 			survivalism: 0,
 		};
-		this.base = 1;
+		this.base = 40;
 	}
 	older(t) {
 		this.age += (this.ageRate * t);
@@ -49,6 +50,10 @@ class Leader {
 	forage() {
 		this.give('food', this.base);
 		this.skills.survivalism += this.base;
+	}
+	farm() {
+		this.give('food', 2 * this.base);
+		this.skills.farming += this.base;
 	}
 	gatherWood() {
 		this.give('wood', this.base);

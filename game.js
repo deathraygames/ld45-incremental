@@ -15,7 +15,7 @@ const elementNames = [
 	'fullness-value', 'fullness-warning',
 	'location-name', 'space-free', 'space-used',
 	'donate', 'donate-what',
-	'eat',
+	'eat', 'farm',
 	'tents',
 	'huts',
 	'houses',
@@ -28,6 +28,7 @@ const clicks = {
 	'eat': () => { leader.eat(); },
 	'meditate':  () => { leader.meditate(locations[locationIndex]); },
 	'forage':  () => { leader.forage(locations[locationIndex]); },
+	'farm': () => { leader.farm(locations[locationIndex]); },
 	'gather-wood': () => { leader.gatherWood(locations[locationIndex]); },
 	'chop-wood': () => { leader.chopWood(locations[locationIndex]); },
 	'mine-stone': () => { leader.mineStone(locations[locationIndex]); },
@@ -53,7 +54,7 @@ const locations = [];
 locations.push(new Location('The dark forest'));
 locations.push(new Location('Pine forest'));
 locations.push(new Location('Dusty desert'));
-
+let tRunning = 0;
 const locationIndex = 0;
 const leader = new Leader();
 
@@ -100,10 +101,15 @@ function getDropWhat() {
 }
 
 function gameLoop(deltaT) {
+	tRunning += deltaT;
 	const loc = locations[locationIndex];
 	// console.log('ding');
 	leader.older(deltaT);
 	loc.older(deltaT);
+	if (tRunning >= 1) {
+		tRunning -= 1;
+		loc.rejob();
+	}
 	const vm = getDomeViewModel(loc);
 	checkUnlocks(vm);
 	refreshInventory();
@@ -141,13 +147,15 @@ function getDomeViewModel(loc) {
 		'temples': getNum(loc.buildings.temple),
 
 		'pop-total': getNum(loc.getPopulationTotal()),
-		'pop-hobos': getNum(loc.population.hobo),
+		'pop-hobo': getNum(loc.population.hobo),
+		'pop-forager': getNum(loc.population.forager),
+		'pop-farmer': getNum(loc.population.farmer),
 	};
 }
 
 function getNum(n) {
 	if (typeof n !== 'number') { return 0; }
-	return Math.floor(n);
+	return Math.floor(n).toLocaleString();
 }
 
 function checkUnlocks(vm) {
