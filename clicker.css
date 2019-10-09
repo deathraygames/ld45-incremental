@@ -14,6 +14,9 @@ button {
 	font-size: inherit;
 	cursor: pointer;
 }
+button:disabled {
+	cursor: not-allowed;
+}
 
 dt, dd {
 	display: inline-block;
