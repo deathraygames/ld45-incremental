@@ -18,7 +18,7 @@ class Leader {
 			science: 0,
 			survivalism: 0,
 		};
-		this.base = 40;
+		this.base = (window.location.hostname === '127.0.0.1') ? 40 : 2; // TODO: reduce to 1 for harder difficulty
 	}
 	older(t) {
 		this.age += (this.ageRate * t);
