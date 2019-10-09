@@ -43,7 +43,7 @@
 		</section>
 		<section class="actions">
 			<h1>Actions</h1>
-			<button class="eat locked" data-unlock="{'food-value': 2}">🦷Eat</button>
+			<button class="eat locked" data-unlock="{'upgraded-teeth': true}">🦷Eat</button>
 			<button class="forage">🍓Forage</button>
 			<button class="farm locked" data-unlock="{'farms': 1}">🌾Farm</button>
 			<button class="gather-wood locked" data-unlock="{'survivalism-value':50}">🌳Gather Wood</button>
@@ -80,7 +80,7 @@
 				</div>
 			</dl>
 		</section>
-		<section class="stats locked" data-unlock="{'food-value': 10}">
+		<section class="stats locked" data-unlock="{'food-value': 50}">
 			<dl>
 				<div class="locked" data-unlock="{'enlightenment-value': 50}">
 					<dt>Age</dt><dd class="age-value"></dd>
@@ -91,8 +91,14 @@
 				</div>
 			</dl>
 		</section>
+		<section class="locked" data-unlock="{'food-value': 10}">
+			<h1>Upgrades</h1>
+			<dl class="unlocked-upgrades-list">
+				<!-- fill with js -->
+			</dl>
+		</section>
 	</article>
-	<article class="location locked" data-unlock="{'enlightenment-value': 20}">
+	<article class="location locked" data-unlock="{'upgraded-location': true}">
 		<header>
 			<h1 class="edit edit-location-name">🌄<span class="location-name"></span></h1>
 		</header>
@@ -140,6 +146,8 @@
 	</article>
 </main>
 <div>
+	<script src="upgrade-data.js" type="module"></script>
+	<script src="Upgrader.js" type="module"></script>
 	<script src="Dome.js" type="module"></script>
 	<script src="Leader.js" type="module"></script>
 	<script src="Location.js" type="module"></script>

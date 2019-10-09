@@ -2,8 +2,11 @@ import Dome from './Dome.js';
 import Loop from './Loop.js';
 import Leader from './Leader.js';
 import Location from './Location.js';
+import Upgrader from './Upgrader.js';
+import upgradeData from './upgrade-data.js';
 
 const loop = new Loop(gameLoop);
+const upgrader = new Upgrader(upgradeData);
 const elementNames = [
 	// 'meditate', 'forage',
 	'leader-name',
@@ -23,6 +26,7 @@ const elementNames = [
 	'temples',
 	'pop-total',
 	'pop-hobos',
+	'unlocked-upgrades-list',
 ];
 const clicks = {
 	'eat': () => { leader.eat(); },
@@ -60,8 +64,10 @@ const leader = new Leader();
 
 const game = {
 	dome,
+	loop,
 	leader,
-	locations
+	locations,
+	upgrader
 };
 
 function startGame() {
@@ -102,15 +108,19 @@ function getDropWhat() {
 
 function gameLoop(deltaT) {
 	tRunning += deltaT;
-	const loc = locations[locationIndex];
-	// console.log('ding');
+	const location = locations[locationIndex];
+	const data = { leader, location };
+
 	leader.older(deltaT);
-	loc.older(deltaT);
+	location.older(deltaT);
+	
 	if (tRunning >= 1) {
 		tRunning -= 1;
-		loc.rejob();
+		location.rejob();
+		upgrader.checkUnlock(data);
+		upgrader.setupUnpurchasedList(dome, 'unlocked-upgrades-list', 5);
 	}
-	const vm = getDomeViewModel(loc);
+	const vm = getDomeViewModel(location);
 	checkUnlocks(vm);
 	refreshInventory();
 	dome.update(vm);
@@ -118,7 +128,7 @@ function gameLoop(deltaT) {
 
 function getDomeViewModel(loc) {
 	// console.log(leader);
-	return {
+	const vm = {
 		'food-value': getNum(leader.inventory.food),
 		'wood-value': getNum(leader.inventory.wood),
 		'stone-value': getNum(leader.inventory.stone),
@@ -151,6 +161,7 @@ function getDomeViewModel(loc) {
 		'pop-forager': getNum(loc.population.forager),
 		'pop-farmer': getNum(loc.population.farmer),
 	};
+	return Object.assign(vm, upgrader.getUpgradedModel());
 }
 
 function getNum(n) {
@@ -166,8 +177,9 @@ function checkUnlocks(vm) {
 		const unlock = (fixedUnlockAttr) ? JSON.parse(fixedUnlockAttr) : {};
 		const unlockKeys = Object.keys(unlock);
 		unlockKeys.forEach((key) => {
+			const isNumber = (typeof unlock[key] === 'number');
 			// console.log("comparing", vm[key], unlock[key]);
-			if (vm[key] >= unlock[key]) {
+			if (isNumber && vm[key] >= unlock[key] || vm[key] === unlock[key]) {
 				unlockCount++;
 			}
 		});

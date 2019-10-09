@@ -57,9 +57,16 @@ class Dome {
 			const elts = this.getElements(key);
 			if (!elts) { return; }
 			elts.forEach((elt) => {
+				if (elt.innerHTML === data[key]) { return; }
 				elt.innerHTML = data[key];
 			});
 		});
+	}
+	updateElement(name, html) {
+		const elt = this.getElement(name);
+		if (elt.innerHTML === html) { return; }
+		elt.innerHTML = html;
+		return elt;
 	}
 }
 export default Dome;
