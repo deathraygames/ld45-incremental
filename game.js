@@ -24,7 +24,7 @@ const elementNames = [
 	'houses',
 	'farms',
 	'temples',
-	'pop-total',
+	'pop-total', 'pop-max',
 	'pop-hobos',
 	'unlocked-upgrades-list',
 ];
@@ -118,7 +118,7 @@ function gameLoop(deltaT) {
 		tRunning -= 1;
 		location.rejob();
 		upgrader.checkUnlock(data);
-		upgrader.setupUnpurchasedList(dome, 'unlocked-upgrades-list', 5);
+		upgrader.setupUnpurchasedList(dome, 'unlocked-upgrades-list', 8);
 	}
 	const vm = getDomeViewModel(location);
 	checkUnlocks(vm);
@@ -157,6 +157,7 @@ function getDomeViewModel(loc) {
 		'temples': getNum(loc.buildings.temple),
 
 		'pop-total': getNum(loc.getPopulationTotal()),
+		'pop-max': getNum(loc.getMaxPopulation()),
 		'pop-hobo': getNum(loc.population.hobo),
 		'pop-forager': getNum(loc.population.forager),
 		'pop-farmer': getNum(loc.population.farmer),

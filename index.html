@@ -31,7 +31,7 @@
 					<dt>🔩Ore</dt><dd class="ore-value"></dd>
 				</div>
 			</dl>
-			<div class="locked" data-unlock="{'food-value': 50}">
+			<div class="locked" data-unlock="{'upgraded-drop': true}">
 				<select class="donate-what">
 					<option value="food">Food</option>
 					<option value="wood">Wood</option>
@@ -46,18 +46,18 @@
 			<button class="eat locked" data-unlock="{'upgraded-teeth': true}">🦷Eat</button>
 			<button class="forage">🍓Forage</button>
 			<button class="farm locked" data-unlock="{'farms': 1}">🌾Farm</button>
-			<button class="gather-wood locked" data-unlock="{'survivalism-value':50}">🌳Gather Wood</button>
-			<button class="chop-wood locked" data-unlock="{'lumbering-value':100}">🌲Chop Wood</button>
-			<button class="mine-stone locked" data-unlock="{'lumbering-value':120}">⚒⛰Mine Stone</button>
-			<button class="mine-ore locked" data-unlock="{'mining-value':100}">⛏⛰Mine Ore</button>
-			<button class="meditate locked" data-unlock="{'fullness-value': 80}">📿Meditate</button>
-			<button class="experiment locked" data-unlock="{'enlightenment-value':100}">🧠Experiment</button>
-			<button class="build-tent locked" data-unlock="{'lumbering-value': 10, 'science-value': 10}">🏕Build Tent</button>
-			<button class="build-hut locked" data-unlock="{'building-value': 10, 'science-value': 50}">🧱Build Hut</button>
-			<button class="build-house locked" data-unlock="{'building-value': 50, 'science-value': 75}">🏠Build House</button>
-			<button class="build-farm locked" data-unlock="{'building-value': 10, 'science-value': 60}">🌱Build Farm</button>
+			<button class="gather-wood locked" data-unlock="{'upgraded-gather-wood': true}">🌳Gather Wood</button>
+			<button class="chop-wood locked" data-unlock="{'upgraded-axe': true}">🌲Chop Wood</button>
+			<button class="mine-stone locked" data-unlock="{'upgraded-pickaxe': true}">⚒⛰Mine Stone</button>
+			<button class="mine-ore locked" data-unlock="{'upgraded-ore-mining': true}">⛏⛰Mine Ore</button>
+			<button class="meditate locked" data-unlock="{'upgraded-focus': true}">📿Meditate</button>
+			<button class="experiment locked" data-unlock="{'upgraded-science': true}">🧠Experiment</button>
+			<button class="build-tent locked" data-unlock="{'upgraded-tent-builder': true}">🏕Build Tent</button>
+			<button class="build-hut locked" data-unlock="{'upgraded-hut-builder': true}">🧱Build Hut</button>
+			<button class="build-house locked" data-unlock="{'upgraded-house-builder': true}">🏠Build House</button>
+			<button class="build-farm locked" data-unlock="{'upgraded-farm-builder': true}">🌱Build Farm</button>
 		</section>
-		<section class="skills locked" data-unlock="{'survivalism-value': 20}">
+		<section class="skills locked" data-unlock="{'upgraded-skills': true}">
 			<h1>Skills</h1>
 			<dl>
 				<div class="locked" data-unlock="{'building-value': 1}">
@@ -80,9 +80,9 @@
 				</div>
 			</dl>
 		</section>
-		<section class="stats locked" data-unlock="{'food-value': 50}">
+		<section class="stats locked" data-unlock="{'upgraded-teeth': true}">
 			<dl>
-				<div class="locked" data-unlock="{'enlightenment-value': 50}">
+				<div class="locked" data-unlock="{'upgraded-time': true}">
 					<dt>Age</dt><dd class="age-value"></dd>
 				</div>
 				<div>
@@ -136,7 +136,7 @@
 			</dl>
 		</section>
 		<section class="locked" data-unlock="{'pop-total': 1}">
-			<h1>Population: <span class="pop-total"></span></h1>
+			<h1>Population: <span class="pop-total"></span> / <span class="pop-max"></span></h1>
 			<dl>
 				<div><dt>Hobos</dt><dd class="pop-hobo"></dd></div>
 				<div><dt>Foragers</dt><dd class="pop-forager"></dd></div>

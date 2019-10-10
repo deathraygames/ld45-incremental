@@ -4,9 +4,9 @@ class Location {
 		this.inventory = {};
 		this.space = 100;
 		this.requirements = {
-			tent: {wood: 100},
-			hut: {wood: 500},
-			house: {wood: 600, stone: 100},
+			tent: {wood: 60},
+			hut: {wood: 100},
+			house: {wood: 200, stone: 100},
 			farm: {food: 50, wood: 100} 
 		};
 		this.buildings = {};
@@ -62,6 +62,7 @@ class Location {
 		this.work(t);
 	}
 	immigration(t) {
+		if (this.getPopulationTotal() >= this.getMaxPopulation()) { return false; }
 		this.population.hobo += t * this.immigrationRate;
 	}
 	work(t) {
@@ -99,6 +100,14 @@ class Location {
 		const keys = Object.keys(this.population);
 		const n = keys.reduce((sum, val) => { return sum + this.population[val]; }, 0);
 		return Math.floor(n);
+	}
+	getMaxPopulation() {
+		let housingCapacity = 0;
+		const buildingsKeys = Object.keys(this.buildings);
+		buildingsKeys.forEach((key) => {
+			housingCapacity += (this.buildings[key] * this.capacities[key]);
+		});
+		return housingCapacity;
 	}
 }
 
