@@ -51,6 +51,9 @@ class Dome {
 	getElement(name) {
 		return this.getElements(name)[0];
 	}
+	getFocus() {
+		return this.doc.activeElement;
+	}
 	update(data) {
 		const keys = Object.keys(data);
 		keys.forEach((key) => {

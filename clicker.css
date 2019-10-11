@@ -13,6 +13,7 @@ button {
 	font-family: inherit;
 	font-size: inherit;
 	cursor: pointer;
+	box-shadow: 0 0.2em 0.2em rgba(0,0,0,0.07);
 }
 button:disabled {
 	cursor: not-allowed;
@@ -26,7 +27,7 @@ dt {
 }
 dd {
 	margin: 0 0 0 1em;
-	min-width: 7em;
+	min-width: 6em;
 	text-align: right;
 }
 
@@ -39,11 +40,14 @@ footer {
 	font-size: 80%;
 	opacity: 0.8;
 	padding: 1em;
+	text-align: center;
 }
 
 main {
 	display: flex;
 	padding: 0;
+	margin: 0 auto;
+	max-width: 1200px;
 }
 article {
 	flex-grow: 1;
@@ -78,20 +82,33 @@ article > header h1 {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
-	transition: 0.5s all ease-in-out;
+	transition-timing-function: ease-in-out;
+	transition: all 0.5s, opacity 3s;
 	transform: scale(0);
 }
 .unlocked {
 	opacity: 1;
 	transform: scale(1);
-	transition: 0.5s all ease-in-out;
+	transition-timing-function: ease-in-out;
+	transition: all 0.5s, opacity 3s;
 }
 
 .actions {
 	user-select: none;
 }
+.actions button:focus {
+	border: solid 3px #4499ff;
+	box-shadow: none;
+}
+.actions button:active {
+	border: solid 3px #99ffff;
+}
 
 .edit:hover {
 	color: #44aaaa;
 	cursor: help;
+}
+
+.upgrade button {
+	min-width: 13em;
 }

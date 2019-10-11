@@ -28,17 +28,12 @@ const elementNames = [
 	'pop-hobos',
 	'unlocked-upgrades-list',
 ];
+const clickActions = ['eat', 'meditate', 'forage', 'farm', 'gatherWood', 'chopWood', 'mineStone', 'mineOre', 'experiment'];
+const clickBuildActions = ['tent', 'hut', 'house', 'farm', 'mine', 'temple', 'academy'];
 const clicks = {
-	'eat': () => { leader.eat(); },
-	'meditate':  () => { leader.meditate(locations[locationIndex]); },
-	'forage':  () => { leader.forage(locations[locationIndex]); },
-	'farm': () => { leader.farm(locations[locationIndex]); },
-	'gather-wood': () => { leader.gatherWood(locations[locationIndex]); },
-	'chop-wood': () => { leader.chopWood(locations[locationIndex]); },
-	'mine-stone': () => { leader.mineStone(locations[locationIndex]); },
-	'mine-ore': () => { leader.mineOre(locations[locationIndex]); },
-	'experiment': () => { leader.experiment(locations[locationIndex]); },
-	'donate': () => { leader.drop(getDropWhat(), locations[locationIndex]); },
+	'donate': () => {
+		leader.drop(getDropWhat(), locations[locationIndex]);
+	},
 	'edit-leader-name': () => {
 		leader.name = window.prompt('Edit name', leader.name);
 		updateNames();
@@ -48,16 +43,19 @@ const clicks = {
 		loc.name = window.prompt('Edit name', loc.name);
 		updateNames();
 	},
-	'build-tent': () => { build('tent'); },
-	'build-hut': () => { build('hut'); },
-	'build-house': () => { build('house'); },
-	'build-farm': () => { build('farm'); },
 };
+clickActions.forEach((action) => {
+	clicks[action] = function() { leaderAction(action); }
+});
+clickBuildActions.forEach((what) => {
+	clicks[`build-${what}`] = function() { build(what); }
+});
 const dome = new Dome({ elementNames, clicks, onReady: startGame });
 const locations = [];
 locations.push(new Location('The dark forest'));
 locations.push(new Location('Pine forest'));
 locations.push(new Location('Dusty desert'));
+let focusedActionTimer = 0;
 let tRunning = 0;
 const locationIndex = 0;
 const leader = new Leader();
@@ -88,6 +86,22 @@ function build(what) {
 	return didBuild;
 }
 
+function leaderAction(action) {
+	const location = locations[locationIndex];
+	dome.getElement(action).focus();
+	return leader[action](location);
+}
+
+function leaderActionValidated(action) {
+	if (clickActions.indexOf(action) === -1) { return; }
+	return leaderAction(action);
+}
+
+function actionByFocus() {
+	const focus = dome.getFocus();
+	focus.classList.forEach((className) => { leaderActionValidated(className); });
+}
+
 function refreshInventory() {
 	const total = leader.getInventoryTotal();
 	if (total) {
@@ -108,6 +122,7 @@ function getDropWhat() {
 
 function gameLoop(deltaT) {
 	tRunning += deltaT;
+	focusedActionTimer += deltaT;
 	const location = locations[locationIndex];
 	const data = { leader, location };
 
@@ -119,6 +134,10 @@ function gameLoop(deltaT) {
 		location.rejob();
 		upgrader.checkUnlock(data);
 		upgrader.setupUnpurchasedList(dome, 'unlocked-upgrades-list', 8);
+	}
+	if (focusedActionTimer > 1) {
+		focusedActionTimer = 0;
+		actionByFocus();
 	}
 	const vm = getDomeViewModel(location);
 	checkUnlocks(vm);
@@ -154,13 +173,21 @@ function getDomeViewModel(loc) {
 		'huts': getNum(loc.buildings.hut),
 		'houses': getNum(loc.buildings.house),
 		'farms': getNum(loc.buildings.farm),
+		'mines': getNum(loc.buildings.mine),
 		'temples': getNum(loc.buildings.temple),
+		'academies': getNum(loc.buildings.academy),
 
 		'pop-total': getNum(loc.getPopulationTotal()),
 		'pop-max': getNum(loc.getMaxPopulation()),
 		'pop-hobo': getNum(loc.population.hobo),
 		'pop-forager': getNum(loc.population.forager),
 		'pop-farmer': getNum(loc.population.farmer),
+		'pop-miner': getNum(loc.population.miner),
+		'pop-monk': getNum(loc.population.monk),
+		'pop-academic': getNum(loc.population.academic),
+
+		'used-space': getNum(loc.getUsedSpace()),
+		'free-space': getNum(loc.getFreeSpace()),
 	};
 	return Object.assign(vm, upgrader.getUpgradedModel());
 }
@@ -177,6 +204,7 @@ function checkUnlocks(vm) {
 		const fixedUnlockAttr = (unlockAttr) ? unlockAttr.replace(/'/g, "\"") : '{}';
 		const unlock = (fixedUnlockAttr) ? JSON.parse(fixedUnlockAttr) : {};
 		const unlockKeys = Object.keys(unlock);
+		if (unlockKeys.length === 0) { return; } // no way provided on how to unlock
 		unlockKeys.forEach((key) => {
 			const isNumber = (typeof unlock[key] === 'number');
 			// console.log("comparing", vm[key], unlock[key]);
@@ -186,7 +214,7 @@ function checkUnlocks(vm) {
 		});
 		if (unlockCount >= unlockKeys.length) {
 			unlockElement(elt);
-			dome.setElement('locked');
+			dome.setElement('locked'); // reset
 		}
 	});
 }

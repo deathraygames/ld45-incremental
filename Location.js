@@ -1,3 +1,12 @@
+// const buildingData = [
+// 	{
+// 		key: '',
+// 		requires: {},
+// 		capacity: 0,
+// 		worker: ''
+// 	}
+// ];
+
 class Location {
 	constructor(name) {
 		this.name = name;
@@ -7,7 +16,10 @@ class Location {
 			tent: {wood: 60},
 			hut: {wood: 100},
 			house: {wood: 200, stone: 100},
-			farm: {food: 50, wood: 100} 
+			farm: {food: 50, wood: 100},
+			mine: {wood: 500, stone: 500},
+			temple: {wood: 100, stone: 1000, ore: 500},
+			academy: {wood: 1000, stone: 1000, ore: 1000},
 		};
 		this.buildings = {};
 		this.capacities = {
@@ -15,11 +27,25 @@ class Location {
 			hut: 2,
 			house: 4,
 			farm: 4,
+			mine: 5,
+			temple: 5,
+			academy: 5,
 		};
 		this.population = {
 			hobo: 0,
 			forager: 0,
 			farmer: 0,
+			miner: 0,
+			monk: 0,
+			academic: 0,
+		};
+		this.jobBuildingMapping = {
+			hobo: null,
+			forager: null,
+			farmer: 'farm',
+			miner: 'mine',
+			monk: 'temple',
+			academic: 'academy',
 		};
 		this.eatRate = 0.6;
 		this.immigrationRate = 0.1;
@@ -43,6 +69,7 @@ class Location {
 		return (count >= keys.length);
 	}
 	build(what, amount = 1) {
+		if (this.getFreeSpace() <= 0) { return false; }
 		const consumedAll = this.consumeCollection(this.getBuildRequirements(what));
 		if (!consumedAll) { return false; }
 		this.buildings[what] = (this.buildings[what] || 0) + amount;
@@ -68,8 +95,12 @@ class Location {
 	work(t) {
 		const foodEarned = t * ((this.population.forager * 0.5) + (this.population.farmer * 1));
 		const woodEarned = t * ((this.population.forager * 0.5));
+		const stoneEarned = t * ((this.population.miner * 0.5));
+		const oreEarned = t * ((this.population.miner * 0.5));
 		this.give('food', foodEarned);
 		this.give('wood', woodEarned);
+		this.give('stone', stoneEarned);
+		this.give('ore', oreEarned);
 	}
 	getRandomJob() {
 		const jobs = Object.keys(this.population);
@@ -87,8 +118,11 @@ class Location {
 		if (!oldJob) { return false; }
 
 		const newJob = this.getRandomJob();
-		if (newJob === 'farmer' && this.population.farmer >= this.capacities.farm * this.buildings.farm) {
-			return false;
+		const workBuilding = this.jobBuildingMapping[newJob];
+		if (workBuilding) {
+			const maxWorkers = (this.capacities[workBuilding] || 0) * (this.buildings[workBuilding] || 0);
+			// console.log(workBuilding, maxWorkers);
+			if (this.population[newJob] >= maxWorkers) { return false; }
 		}
 		this.rejobFromTo(oldJob, newJob);
 	}
@@ -108,6 +142,13 @@ class Location {
 			housingCapacity += (this.buildings[key] * this.capacities[key]);
 		});
 		return housingCapacity;
+	}
+	getUsedSpace() {
+		const buildingsKeys = Object.keys(this.buildings);
+		return buildingsKeys.reduce((acc, key) => { return acc + (this.buildings[key] || 0); }, 0);
+	}
+	getFreeSpace() {
+		return this.space - this.getUsedSpace();
 	}
 }
 

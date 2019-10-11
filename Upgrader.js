@@ -127,13 +127,19 @@ class Upgrader {
 		upgrades.forEach((upgrade) => {
 			const i = upgrade.index;
 			const statusClass = this.getStatusClass(i);
-			const disabled = (!this.canAfford(upgrade) || this.isLockedByIndex(i)) ? 'disabled' : '';
+			const locked = this.isLockedByIndex(i);
+			const disabled = (!this.canAfford(upgrade) || locked) ? 'disabled' : '';
 			const descriptionHtml = (upgrade.description) ? `<dd>${upgrade.description}</dd>` : '';
 			const costHtml = (upgrade.cost) ? `<dd>${upgrade.cost}</dd>` : '';
+			const unlockTitle = (locked) ? this.getUnlockRequiresCost(upgrade) : '';
 			html += (
 				`<div class="upgrade">
 					<dt>
-						<button type="button" class="upgrade-${i} ${statusClass}" ${disabled} data-upgradeindex="${i}">${upgrade.name}</button>
+						<button type="button"
+							class="upgrade-${i} ${statusClass}" ${disabled}
+							data-upgradeindex="${i}"
+							title="${unlockTitle}"
+						>${upgrade.name}</button>
 					</dt>
 					${descriptionHtml}
 					${costHtml}
@@ -156,6 +162,12 @@ class Upgrader {
 		if (this.isUnlockedByIndex(i)) {
 			return prefix + 'unlocked';
 		}
+	}
+	getUnlockRequiresCost(upgrade) {
+		return 'Unlock with ' + JSON.stringify(upgrade.requires)
+			.replace(/\./g, ' ')
+			.replace(/["{}]/g, '')
+			.replace(',', ', ').replace(':', ': ');
 	}
 	getClassName(upgrade) {
 		return (upgrade.key || upgrade.name).replace(/ /g, '-').toLowerCase();
