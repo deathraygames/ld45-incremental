@@ -11,7 +11,7 @@ class Location {
 	constructor(name) {
 		this.name = name;
 		this.inventory = {};
-		this.space = 100;
+		this.space = 1000;
 		this.requirements = {
 			tent: {wood: 60},
 			hut: {wood: 100},
