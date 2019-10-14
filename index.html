@@ -38,7 +38,7 @@
 					<option value="stone" class="locked">Stone</option>
 					<option value="ore" class="locked">Ore</option>
 				</select>
-				<button class="donate">Drop/Donate</button>
+				<button class="donate">Drop/Donate &gt;</button>
 			</div>
 		</section>
 		<section class="actions">
@@ -106,21 +106,38 @@
 			<h1 class="edit edit-location-name">🌄<span class="location-name"></span></h1>
 		</header>
 		<section>
-			<h1>Community Items</h1>
+			<h1>Items (Community &amp; Private)</h1>
 			<dl>
 				<div class="locked" data-unlock="{'community-food': 1}">
-					<dt>🍓Food</dt><dd class="community-food"></dd>
+					<dt>🍓Food</dt>
+					<dd class="community-food"></dd>
+					<dd class="private-food"></dd>
 				</div>
 				<div class="locked" data-unlock="{'community-wood': 1}">
-					<dt>🌳Wood</dt><dd class="community-wood"></dd>
+					<dt>🌳Wood</dt>
+					<dd class="community-wood"></dd>
+					<dd class="private-wood"></dd>
 				</div>
 				<div class="locked" data-unlock="{'community-stone': 1}">
-					<dt>🧱Stone</dt><dd class="community-stone"></dd>
+					<dt>🧱Stone</dt>
+					<dd class="community-stone"></dd>
+					<dd class="private-stone"></dd>
 				</div>
 				<div class="locked" data-unlock="{'community-ore': 1}">
-					<dt>🔩Ore</dt><dd class="community-ore"></dd>
+					<dt>🔩Ore</dt>
+					<dd class="community-ore"></dd>
+					<dd class="private-ore"></dd>
 				</div>
 			</dl>
+			<div>
+				<button class="take">&lt; Take</button>
+				<select class="take-what">
+					<option value="food">Food</option>
+					<option value="wood">Wood</option>
+					<option value="stone">Stone</option>
+					<option value="ore">Ore</option>
+				</select>
+			</div>
 		</section>
 		<section>
 			<h1>Buildings</h1>
@@ -142,6 +159,7 @@
 		</section>
 		<section class="locked" data-unlock="{'pop-total': 1}">
 			<h1>Population: <span class="pop-total"></span> / <span class="pop-max"></span></h1>
+			<div>+<span class="immigration-rate"></span>/sec</div>
 			<dl>
 				<div><dt>Hobos</dt><dd class="pop-hobo"></dd></div>
 				<div><dt>Foragers</dt><dd class="pop-forager"></dd></div>
@@ -154,7 +172,7 @@
 	</article>
 </main>
 <footer>
-	v0.5.1
+	v0.6.0
 </footer>
 <div>
 	<script src="upgrade-data.js" type="module"></script>

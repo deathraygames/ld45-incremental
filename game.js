@@ -17,7 +17,7 @@ const elementNames = [
 	'food-value', 'wood-value', 'stone-value', 'ore-value',
 	'fullness-value', 'fullness-warning',
 	'location-name', 'space-free', 'space-used',
-	'donate', 'donate-what',
+	'donate', 'donate-what', 'take-what',
 	'eat', 'farm',
 	'tents',
 	'huts',
@@ -32,7 +32,11 @@ const clickActions = ['eat', 'meditate', 'forage', 'farm', 'gatherWood', 'chopWo
 const clickBuildActions = ['tent', 'hut', 'house', 'farm', 'mine', 'temple', 'academy'];
 const clicks = {
 	'donate': () => {
-		leader.drop(getDropWhat(), locations[locationIndex]);
+		leader.inventory.drop(getDropWhat(), locations[locationIndex], 100);
+	},
+	'take': () => {
+		const location = locations[locationIndex];
+		location.inventory.transfer(getTakeWhat(), leader, 100);
 	},
 	'edit-leader-name': () => {
 		leader.name = window.prompt('Edit name', leader.name);
@@ -78,7 +82,7 @@ function build(what) {
 	const reqs = loc.getBuildRequirements(what);
 	const canBuild = leader.checkInventory(reqs);
 	if (!canBuild) { return false; }
-	leader.dropCollection(reqs, loc);
+	leader.inventory.dropCollection(reqs, loc);
 	const didBuild = loc.build(what);
 	if (didBuild) {
 		leader.build(what);
@@ -117,6 +121,11 @@ function refreshInventory() {
 
 function getDropWhat() {
 	const selector = dome.getElement('donate-what');
+	return selector[selector.selectedIndex].value || 'food';
+}
+
+function getTakeWhat() {
+	const selector = dome.getElement('take-what');
 	return selector[selector.selectedIndex].value || 'food';
 }
 
@@ -168,6 +177,10 @@ function getDomeViewModel(loc) {
 		'community-wood': getNum(loc.inventory.wood),
 		'community-stone': getNum(loc.inventory.stone),
 		'community-ore': getNum(loc.inventory.ore),
+		'private-food': getNum(loc.privateInventory.food),
+		'private-wood': getNum(loc.privateInventory.wood),
+		'private-stone': getNum(loc.privateInventory.stone),
+		'private-ore': getNum(loc.privateInventory.ore),
 
 		'tents': getNum(loc.buildings.tent),
 		'huts': getNum(loc.buildings.hut),
@@ -177,6 +190,7 @@ function getDomeViewModel(loc) {
 		'temples': getNum(loc.buildings.temple),
 		'academies': getNum(loc.buildings.academy),
 
+		'immigration-rate': getDecimal(loc.immigrationRate),
 		'pop-total': getNum(loc.getPopulationTotal()),
 		'pop-max': getNum(loc.getMaxPopulation()),
 		'pop-hobo': getNum(loc.population.hobo),
@@ -195,6 +209,11 @@ function getDomeViewModel(loc) {
 function getNum(n) {
 	if (typeof n !== 'number') { return 0; }
 	return Math.floor(n).toLocaleString();
+}
+
+function getDecimal(n, d = 10) {
+	if (typeof n !== 'number') { return 0; }
+	return (Math.floor(n * d) / d).toLocaleString();
 }
 
 function checkUnlocks(vm) {

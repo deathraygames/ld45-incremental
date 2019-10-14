@@ -1,3 +1,5 @@
+import Inventory from "./Inventory.js";
+
 // const buildingData = [
 // 	{
 // 		key: '',
@@ -10,7 +12,8 @@
 class Location {
 	constructor(name) {
 		this.name = name;
-		this.inventory = {};
+		this.inventory = new Inventory();
+		this.privateInventory = new Inventory();
 		this.space = 1000;
 		this.requirements = {
 			tent: {wood: 60},
@@ -50,27 +53,9 @@ class Location {
 		this.eatRate = 0.6;
 		this.immigrationRate = 0.1;
 	}
-	give(what, amount) {
-		this.inventory[what] = (this.inventory[what] || 0) + amount;
-	}
-	consume(what, amount = 1) {
-		const quantity = this.inventory[what] || 0;
-		if (quantity < amount) { return false; }
-		this.inventory[what] = quantity - amount;
-		return true;
-	}
-	consumeCollection(stuff) {
-		const keys = Object.keys(stuff);
-		let count = 0;
-		keys.forEach((key) => {
-			const consumed = this.consume(key, stuff[key]);
-			count += (consumed) ? 1 : 0;
-		});
-		return (count >= keys.length);
-	}
 	build(what, amount = 1) {
 		if (this.getFreeSpace() <= 0) { return false; }
-		const consumedAll = this.consumeCollection(this.getBuildRequirements(what));
+		const consumedAll = this.inventory.consumeCollection(this.getBuildRequirements(what));
 		if (!consumedAll) { return false; }
 		this.buildings[what] = (this.buildings[what] || 0) + amount;
 		return true;
@@ -80,9 +65,18 @@ class Location {
 	}
 	older(t) {
 		const pop = this.getPopulationTotal();
-		if (this.inventory.food > 0) {
-			this.inventory.food -= t * this.eatRate * pop;
+		let foodWanted =  t * this.eatRate * pop;
+		if (this.privateInventory.food > 0) {
+			const privateFoodEaten = Math.min(this.privateInventory.food, foodWanted);
+			this.privateInventory.consume('food', privateFoodEaten);
+			foodWanted -= privateFoodEaten;
 		}
+		if (this.inventory.food > 0) {
+			const communityFoodEaten = Math.min(this.inventory.food, foodWanted);
+			this.inventory.consume('food', communityFoodEaten);
+			foodWanted -= communityFoodEaten;
+		}
+		// TODO: if food wanted is still positive then starvation
 		if (this.inventory.food > 100 && this.inventory.food > (pop * 50)) {
 			this.immigration(t);
 		}
@@ -92,15 +86,30 @@ class Location {
 		if (this.getPopulationTotal() >= this.getMaxPopulation()) { return false; }
 		this.population.hobo += t * this.immigrationRate;
 	}
+	getResourceRates(t) {
+		const rates = {
+			food: t * ((this.population.forager * 0.5) + (this.population.farmer * 1)),
+			wood: t * ((this.population.forager * 0.5)),
+			stone: t * ((this.population.miner * 0.5)),
+			ore: t * ((this.population.miner * 0.5)),
+		};
+		return rates;
+	}
+	getTaxRate() {
+		return 0.1;
+	}
 	work(t) {
-		const foodEarned = t * ((this.population.forager * 0.5) + (this.population.farmer * 1));
-		const woodEarned = t * ((this.population.forager * 0.5));
-		const stoneEarned = t * ((this.population.miner * 0.5));
-		const oreEarned = t * ((this.population.miner * 0.5));
-		this.give('food', foodEarned);
-		this.give('wood', woodEarned);
-		this.give('stone', stoneEarned);
-		this.give('ore', oreEarned);
+		const rates = this.getResourceRates(t);
+		const tax = this.getTaxRate();
+		const privateMultiplier = 1 - tax;
+		this.privateInventory.give('food', rates.food * privateMultiplier);
+		this.privateInventory.give('wood', rates.wood * privateMultiplier);
+		this.privateInventory.give('stone', rates.stone * privateMultiplier);
+		this.privateInventory.give('ore', rates.ore * privateMultiplier);
+		this.inventory.give('food', rates.food * tax);
+		this.inventory.give('wood', rates.wood * tax);
+		this.inventory.give('stone', rates.stone * tax);
+		this.inventory.give('ore', rates.ore * tax);
 	}
 	getRandomJob() {
 		const jobs = Object.keys(this.population);
