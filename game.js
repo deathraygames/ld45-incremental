@@ -60,7 +60,7 @@ locations.push(new Location('The dark forest'));
 locations.push(new Location('Pine forest'));
 locations.push(new Location('Dusty desert'));
 let focusedActionTimer = 0;
-let tRunning = 0;
+let secondTimer = 0;
 const locationIndex = 0;
 const leader = new Leader();
 
@@ -130,7 +130,7 @@ function getTakeWhat() {
 }
 
 function gameLoop(deltaT) {
-	tRunning += deltaT;
+	secondTimer += deltaT;
 	focusedActionTimer += deltaT;
 	const location = locations[locationIndex];
 	const data = { leader, location };
@@ -138,8 +138,8 @@ function gameLoop(deltaT) {
 	leader.older(deltaT);
 	location.older(deltaT);
 	
-	if (tRunning >= 1) {
-		tRunning -= 1;
+	if (secondTimer >= 1) {
+		secondTimer = 0; // secondTimer -= 1;
 		location.rejob();
 		upgrader.checkUnlock(data);
 		upgrader.setupUnpurchasedList(dome, 'unlocked-upgrades-list', 8);

@@ -51,7 +51,8 @@ class Location {
 			academic: 'academy',
 		};
 		this.eatRate = 0.6;
-		this.immigrationRate = 0.1;
+		this.baseImmigrationRate = 0.1;
+		this.immigrationRate = this.baseImmigrationRate;
 	}
 	build(what, amount = 1) {
 		if (this.getFreeSpace() <= 0) { return false; }
@@ -77,13 +78,20 @@ class Location {
 			foodWanted -= communityFoodEaten;
 		}
 		// TODO: if food wanted is still positive then starvation
-		if (this.inventory.food > 100 && this.inventory.food > (pop * 50)) {
-			this.immigration(t);
-		}
+		this.immigration(t, pop);
 		this.work(t);
 	}
-	immigration(t) {
-		if (this.getPopulationTotal() >= this.getMaxPopulation()) { return false; }
+	getImmigrationRate(pop = this.getPopulationTotal()) {
+		if (this.inventory.food < 100 || this.inventory.food < (pop * 50)) {
+			return 0;
+		}
+		if (pop >= this.getMaxPopulation()) {
+			return 0;
+		}
+		return this.baseImmigrationRate;
+	}
+	immigration(t, pop) {
+		this.immigrationRate = this.getImmigrationRate(pop);
 		this.population.hobo += t * this.immigrationRate;
 	}
 	getResourceRates(t) {
