@@ -168,6 +168,7 @@ function getDomeViewModel(loc) {
 
 		'building-value': getNum(leader.skills.building),
 		'enlightenment-value': getNum(leader.skills.enlightenment),
+		'farming-value': getNum(leader.skills.farming),
 		'lumbering-value': getNum(leader.skills.lumbering),
 		'mining-value': getNum(leader.skills.mining),
 		'science-value': getNum(leader.skills.science),
