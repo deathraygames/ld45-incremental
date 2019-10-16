@@ -23,11 +23,11 @@ dt, dd {
 	display: inline-block;
 }
 dt {
-	min-width: 5em;
+	min-width: 6em;
 }
 dd {
 	margin: 0 0 0 1em;
-	min-width: 6em;
+	min-width: 5em;
 	text-align: right;
 }
 

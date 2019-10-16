@@ -167,7 +167,7 @@ class Upgrader {
 		return 'Unlock with ' + JSON.stringify(upgrade.requires)
 			.replace(/\./g, ' ')
 			.replace(/["{}]/g, '')
-			.replace(',', ', ').replace(':', ': ');
+			.replace(/,/g, ', ').replace(/:/g, ': ');
 	}
 	getClassName(upgrade) {
 		return (upgrade.key || upgrade.name).replace(/ /g, '-').toLowerCase();

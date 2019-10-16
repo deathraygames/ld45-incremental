@@ -1,13 +1,7 @@
-import Inventory from "./Inventory.js";
+import Inventory from './Inventory.js';
+import buildingsData from './buildings-data.js';
 
-// const buildingData = [
-// 	{
-// 		key: '',
-// 		requires: {},
-// 		capacity: 0,
-// 		worker: ''
-// 	}
-// ];
+console.log(buildingsData);
 
 class Location {
 	constructor(name) {
@@ -15,25 +9,8 @@ class Location {
 		this.inventory = new Inventory();
 		this.privateInventory = new Inventory();
 		this.space = 1000;
-		this.requirements = {
-			tent: {wood: 60},
-			hut: {wood: 100},
-			house: {wood: 200, stone: 100},
-			farm: {food: 50, wood: 100},
-			mine: {wood: 500, stone: 500},
-			temple: {wood: 100, stone: 1000, ore: 500},
-			academy: {wood: 1000, stone: 1000, ore: 1000},
-		};
-		this.buildings = {};
-		this.capacities = {
-			tent: 1,
-			hut: 2,
-			house: 4,
-			farm: 4,
-			mine: 5,
-			temple: 5,
-			academy: 5,
-		};
+		this.buildings = [];
+		this.buildingsData = buildingsData;
 		this.population = {
 			hobo: 0,
 			forager: 0,
@@ -42,27 +19,26 @@ class Location {
 			monk: 0,
 			academic: 0,
 		};
-		this.jobBuildingMapping = {
-			hobo: null,
-			forager: null,
-			farmer: 'farm',
-			miner: 'mine',
-			monk: 'temple',
-			academic: 'academy',
-		};
 		this.eatRate = 0.6;
 		this.baseImmigrationRate = 0.1;
 		this.immigrationRate = this.baseImmigrationRate;
 	}
-	build(what, amount = 1) {
+	build(buildingTypeId, amount = 1) {
 		if (this.getFreeSpace() <= 0) { return false; }
-		const consumedAll = this.inventory.consumeCollection(this.getBuildRequirements(what));
+		const consumedAll = this.inventory.consumeCollection(this.getBuildRequirements(buildingTypeId));
 		if (!consumedAll) { return false; }
-		this.buildings[what] = (this.buildings[what] || 0) + amount;
+		this.buildings[buildingTypeId] = (this.buildings[buildingTypeId] || 0) + amount;
 		return true;
 	}
-	getBuildRequirements(what) {
-		return this.requirements[what];
+	getBuildRequirements(buildingTypeId) {
+		return buildingsData[buildingTypeId].cost;
+	}
+	getBuildDescription(buildingTypeId) {
+		const {cost} = buildingsData[buildingTypeId];
+		return JSON.stringify(cost)
+			.replace(/\./g, ' ')
+			.replace(/["{}]/g, '')
+			.replace(/,/g, ', ').replace(/:/g, ': ');
 	}
 	older(t) {
 		const pop = this.getPopulationTotal();
@@ -135,34 +111,49 @@ class Location {
 		if (!oldJob) { return false; }
 
 		const newJob = this.getRandomJob();
-		const workBuilding = this.jobBuildingMapping[newJob];
-		if (workBuilding) {
-			const maxWorkers = (this.capacities[workBuilding] || 0) * (this.buildings[workBuilding] || 0);
-			// console.log(workBuilding, maxWorkers);
-			if (this.population[newJob] >= maxWorkers) { return false; }
-		}
+		const maxWorkers = this.getMaxWorkers(newJob);
+		const currentWorkers = this.population[newJob] || 0;
+		if (currentWorkers >= maxWorkers) { return false; }
 		this.rejobFromTo(oldJob, newJob);
 	}
 	rejobFromTo(fromJob, toJob) {
 		this.population[toJob] += 1;
 		this.population[fromJob] -= 1;		
 	}
+	getMaxWorkers(job) {
+		if (job === 'hobo') {
+			return this.getFreeSpace() * 10;
+		}
+		if (job === 'forager') {
+			return this.getFreeSpace();
+		}
+		const potentialWorkPlaces = this.getBuildingTypesByWorkerType(job);
+		if (potentialWorkPlaces.length === 0) { return false; }
+		const maxWorkers = potentialWorkPlaces.reduce((sum, bt) => {
+			const n = this.buildings[bt.index];
+			return sum + ((n || 0) * (bt.workers || 0));
+		}, 0);
+		return maxWorkers;
+	}
+	getBuildingTypesByWorkerType(workerType) {
+		return this.buildingsData.filter((buildingType) => {
+			return buildingType.workerType === workerType;
+		});
+	}
 	getPopulationTotal() {
 		const keys = Object.keys(this.population);
 		const n = keys.reduce((sum, val) => { return sum + this.population[val]; }, 0);
 		return Math.floor(n);
 	}
-	getMaxPopulation() {
-		let housingCapacity = 0;
-		const buildingsKeys = Object.keys(this.buildings);
-		buildingsKeys.forEach((key) => {
-			housingCapacity += (this.buildings[key] * this.capacities[key]);
-		});
-		return housingCapacity;
+	getMaxPopulation() { // aka. housing capacity
+		return this.buildings.reduce((sum, n, index) => {
+			if (!n) { return sum; }
+			const buildingType = this.buildingsData[index];
+			return sum + (n * buildingType.housing);
+		}, 0);
 	}
 	getUsedSpace() {
-		const buildingsKeys = Object.keys(this.buildings);
-		return buildingsKeys.reduce((acc, key) => { return acc + (this.buildings[key] || 0); }, 0);
+		return this.buildings.reduce((sum, n) => { return sum + (n || 0); }, 0);
 	}
 	getFreeSpace() {
 		return this.space - this.getUsedSpace();

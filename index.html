@@ -52,13 +52,24 @@
 			<button class="mineOre locked" data-unlock="{'upgraded-ore-mining': true}">⛏Mine Ore</button>
 			<button class="meditate locked" data-unlock="{'upgraded-focus': true}">📿Meditate</button>
 			<button class="experiment locked" data-unlock="{'upgraded-science': true}">🧠Experiment</button>
-			<button class="build-tent locked" data-unlock="{'upgraded-tent-builder': true}">🏕Build Tent</button>
-			<button class="build-hut locked" data-unlock="{'upgraded-hut-builder': true}">🧱Build Hut</button>
-			<button class="build-house locked" data-unlock="{'upgraded-house-builder': true}">🏠Build House</button>
-			<button class="build-farm locked" data-unlock="{'upgraded-farm-builder': true}">🌱Build Farm</button>
-			<button class="build-mine locked" data-unlock="{'upgraded-mine-builder': true}">⛰🕳⛏Build Mine</button>
-			<button class="build-temple locked" data-unlock="{'upgraded-temple-builder': true}">⛩Build Temple</button>
-			<button class="build-academy locked" data-unlock="{'upgraded-academy-builder': true}">🏫Build Academy</button>
+			<!--
+			<button class="build-0 locked" data-unlock="{'upgraded-tent-builder': true}">🏕Build Tent</button>
+			<button class="build-1 locked" data-unlock="{'upgraded-hut-builder': true}">🧱Build Hut</button>
+			<button class="build-2 locked" data-unlock="{'upgraded-house-builder': true}">🏠Build House</button>
+			<button class="build-3 locked" data-unlock="{'upgraded-farm-builder': true}">🌱Build Farm</button>
+			<button class="build-4 locked" data-unlock="{'upgraded-mine-builder': true}">⛰🕳⛏Build Mine</button>
+			<button class="build-5 locked" data-unlock="{'upgraded-temple-builder': true}">⛩Build Temple</button>
+			<button class="build-6 locked" data-unlock="{'upgraded-academy-builder': true}">🏫Build Academy</button>
+			-->
+			<form action="" class="locked" data-unlock="{'upgraded-tent-builder': true}">
+				<button type="button" class="build">🔨Build</button>
+				<select class="build-what">
+					<!-- populate with js -->
+				</select>
+				<span class="build-description">
+					<!-- populate with js -->
+				</span>
+			</form>
 		</section>
 		<section class="skills locked" data-unlock="{'upgraded-skills': true}">
 			<h1>Skills</h1>
@@ -109,8 +120,9 @@
 			<h1 class="edit edit-location-name">🌄<span class="location-name"></span></h1>
 		</header>
 		<section>
-			<h1>Items (Community &amp; Private)</h1>
+			<h1>Items</h1>
 			<dl>
+				<div><dt></dt><dd>Community</dd><dd>Private</dd></div>
 				<div class="locked" data-unlock="{'community-food': 1}">
 					<dt>🍓Food</dt>
 					<dd class="community-food"></dd>
@@ -148,17 +160,60 @@
 				<div><dt>Used space</dt><dd class="used-space"></dd></div>
 				<div><dt>Free space</dt><dd class="free-space"></dd></div>
 			</dl>
-			<dl>
-				<div class="" data-unlock="{}">
-					<div><dt>Tents</dt><dd class="tents"></dd></div>
-					<div><dt>Huts</dt><dd class="huts"></dd></div>
-					<div><dt>Houses</dt><dd class="houses"></dd></div>
-					<div><dt>Farms</dt><dd class="farms"></dd></div>
-					<div><dt>Mines</dt><dd class="mines"></dd></div>
-					<div><dt>Temples</dt><dd class="temples"></dd></div>
-					<div><dt>Academies</dt><dd class="academies"></dd></div>
-				</div>
-			</dl>
+			<table>
+				<thead>
+					<tr>
+						<td></td>
+						<td>Community</td>
+						<td>Private</td>
+						<td>Owned</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Tents</td>
+						<td class="tents"></td>
+						<td class="private-tents"></td>
+						<td class="owned-tents"></td>
+					</tr>
+					<tr>
+						<td>Huts</td>
+						<td class="huts"></td>
+						<td class="private-huts"></td>
+						<td class="owned-huts"></td>
+					</tr>
+					<tr>
+						<td>Houses</td>
+						<td class="houses"></td>
+						<td class="private-houses"></td>
+						<td class="owned-houses"></td>
+					</tr>
+					<tr>
+						<td>Farms</td>
+						<td class="farms"></td>
+						<td class="private-farms"></td>
+						<td class="owned-farms"></td>
+					</tr>
+					<tr>
+						<td>Mines</td>
+						<td class="mines"></td>
+						<td class="private-mines"></td>
+						<td class="owned-mines"></td>
+					</tr>
+					<tr>
+						<td>Temples</td>
+						<td class="temples"></td>
+						<td class="private-temples"></td>
+						<td class="owned-temples"></td>
+					</tr>
+					<tr>
+						<td>Academies</td>
+						<td class="academies"></td>
+						<td class="private-academies"></td>
+						<td class="owned-academies"></td>
+					</tr>
+				</tbody>
+			</table>
 		</section>
 		<section class="locked" data-unlock="{'pop-total': 1}">
 			<h1>Population: <span class="pop-total"></span> / <span class="pop-max"></span></h1>
@@ -175,15 +230,9 @@
 	</article>
 </main>
 <footer>
-	v0.6.2
+	v0.7.0
 </footer>
 <div>
-	<script src="upgrade-data.js" type="module"></script>
-	<script src="Upgrader.js" type="module"></script>
-	<script src="Dome.js" type="module"></script>
-	<script src="Leader.js" type="module"></script>
-	<script src="Location.js" type="module"></script>
-	<script src="Loop.js" type="module"></script>
 	<script src="game.js" type="module"></script>
 </div>
 </body>

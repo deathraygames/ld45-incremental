@@ -17,7 +17,7 @@ const elementNames = [
 	'food-value', 'wood-value', 'stone-value', 'ore-value',
 	'fullness-value', 'fullness-warning',
 	'location-name', 'space-free', 'space-used',
-	'donate', 'donate-what', 'take-what',
+	'donate', 'donate-what', 'take-what', 'build-what', 'build',
 	'eat', 'farm',
 	'tents',
 	'huts',
@@ -29,7 +29,6 @@ const elementNames = [
 	'unlocked-upgrades-list',
 ];
 const clickActions = ['eat', 'meditate', 'forage', 'farm', 'gatherWood', 'chopWood', 'mineStone', 'mineOre', 'experiment'];
-const clickBuildActions = ['tent', 'hut', 'house', 'farm', 'mine', 'temple', 'academy'];
 const clicks = {
 	'donate': () => {
 		leader.inventory.drop(getDropWhat(), locations[locationIndex], 100);
@@ -37,6 +36,9 @@ const clicks = {
 	'take': () => {
 		const location = locations[locationIndex];
 		location.inventory.transfer(getTakeWhat(), leader, 100);
+	},
+	'build': () => {
+		build(getBuildWhat());
 	},
 	'edit-leader-name': () => {
 		leader.name = window.prompt('Edit name', leader.name);
@@ -51,10 +53,13 @@ const clicks = {
 clickActions.forEach((action) => {
 	clicks[action] = function() { leaderAction(action); }
 });
-clickBuildActions.forEach((what) => {
+[0,1,2,3,4,5,6].forEach((what) => {
 	clicks[`build-${what}`] = function() { build(what); }
 });
-const dome = new Dome({ elementNames, clicks, onReady: startGame });
+const changes = {
+	'build-what': () => { updateBuildingBuildInfo(); }
+};
+const dome = new Dome({ elementNames, clicks, changes, onReady: startGame });
 const locations = [];
 locations.push(new Location('The dark forest'));
 locations.push(new Location('Pine forest'));
@@ -74,18 +79,19 @@ const game = {
 
 function startGame() {
 	updateNames();
+	updateBuildings();
 	loop.begin();
 }
 
-function build(what) {
+function build(buildingTypeId) {
 	const loc = locations[locationIndex];
-	const reqs = loc.getBuildRequirements(what);
+	const reqs = loc.getBuildRequirements(buildingTypeId);
 	const canBuild = leader.checkInventory(reqs);
 	if (!canBuild) { return false; }
 	leader.inventory.dropCollection(reqs, loc);
-	const didBuild = loc.build(what);
+	const didBuild = loc.build(buildingTypeId);
 	if (didBuild) {
-		leader.build(what);
+		leader.build(buildingTypeId);
 	}
 	return didBuild;
 }
@@ -119,14 +125,28 @@ function refreshInventory() {
 	dome.getElement('donate').disabled = (leader.inventory[key] > 0) ? false : true;
 }
 
+function getLocation() {
+	return locations[locationIndex];
+}
+
 function getDropWhat() {
-	const selector = dome.getElement('donate-what');
-	return selector[selector.selectedIndex].value || 'food';
+	return getSelection('donate-what', 'food');
 }
 
 function getTakeWhat() {
-	const selector = dome.getElement('take-what');
-	return selector[selector.selectedIndex].value || 'food';
+	return getSelection('take-what', 'food');
+}
+
+function getBuildWhat() {
+	return Number.parseInt(getSelection('build-what', 0));
+}
+
+function getSelection(eltName, defaultValue) {
+	const selector = dome.getElement(eltName);
+	if (!selector[selector.selectedIndex] || !selector[selector.selectedIndex].value) {
+		return defaultValue;
+	}
+	return selector[selector.selectedIndex].value;
 }
 
 function gameLoop(deltaT) {
@@ -143,6 +163,7 @@ function gameLoop(deltaT) {
 		location.rejob();
 		upgrader.checkUnlock(data);
 		upgrader.setupUnpurchasedList(dome, 'unlocked-upgrades-list', 8);
+		updateBuildings();
 	}
 	if (focusedActionTimer > 1) {
 		focusedActionTimer = 0;
@@ -183,13 +204,13 @@ function getDomeViewModel(loc) {
 		'private-stone': getNum(loc.privateInventory.stone),
 		'private-ore': getNum(loc.privateInventory.ore),
 
-		'tents': getNum(loc.buildings.tent),
-		'huts': getNum(loc.buildings.hut),
-		'houses': getNum(loc.buildings.house),
-		'farms': getNum(loc.buildings.farm),
-		'mines': getNum(loc.buildings.mine),
-		'temples': getNum(loc.buildings.temple),
-		'academies': getNum(loc.buildings.academy),
+		'tents': getNum(loc.buildings[0]),
+		'huts': getNum(loc.buildings[1]),
+		'houses': getNum(loc.buildings[2]),
+		'farms': getNum(loc.buildings[3]),
+		'mines': getNum(loc.buildings[4]),
+		'temples': getNum(loc.buildings[5]),
+		'academies': getNum(loc.buildings[6]),
 
 		'immigration-rate': getDecimal(loc.immigrationRate),
 		'pop-total': getNum(loc.getPopulationTotal()),
@@ -219,24 +240,28 @@ function getDecimal(n, d = 10) {
 
 function checkUnlocks(vm) {
 	dome.getElements('locked').forEach((elt) => {
-		let unlockCount = 0;
 		const unlockAttr = elt.getAttribute('data-unlock');
 		const fixedUnlockAttr = (unlockAttr) ? unlockAttr.replace(/'/g, "\"") : '{}';
 		const unlock = (fixedUnlockAttr) ? JSON.parse(fixedUnlockAttr) : {};
-		const unlockKeys = Object.keys(unlock);
-		if (unlockKeys.length === 0) { return; } // no way provided on how to unlock
-		unlockKeys.forEach((key) => {
-			const isNumber = (typeof unlock[key] === 'number');
-			// console.log("comparing", vm[key], unlock[key]);
-			if (isNumber && vm[key] >= unlock[key] || vm[key] === unlock[key]) {
-				unlockCount++;
-			}
-		});
-		if (unlockCount >= unlockKeys.length) {
-			unlockElement(elt);
-			dome.setElement('locked'); // reset
+		const isUnlocked = checkUnlock(unlock, vm);
+		if (!isUnlocked) { return; }
+		unlockElement(elt);
+		dome.setElement('locked'); // reset
+	});
+}
+
+function checkUnlock(unlock, vm) {
+	let unlockCount = 0;
+	const unlockKeys = Object.keys(unlock);
+	if (unlockKeys.length === 0) { return; } // no way provided on how to unlock
+	unlockKeys.forEach((key) => {
+		const isNumber = (typeof unlock[key] === 'number');
+		// console.log("comparing", vm[key], unlock[key]);
+		if (isNumber && vm[key] >= unlock[key] || vm[key] === unlock[key]) {
+			unlockCount++;
 		}
 	});
+	return (unlockCount >= unlockKeys.length);	
 }
 
 function unlockElement(elt) {
@@ -255,6 +280,24 @@ function updateNames() {
 		'leader-name': leader.name,
 		'location-name': loc.name,
 	});
+}
+
+function updateBuildings() {
+	const location = locations[locationIndex];
+	const html = location.buildingsData.reduce((str, buildingType) => {
+		const vm = getDomeViewModel(location); // TODO: remove
+		const isUnlocked = checkUnlock(buildingType.unlock, vm);
+		if (!isUnlocked) { return str; }
+		return str + `<option value="${buildingType.index}">${buildingType.name} ${buildingType.emoji}</option>`;
+	}, '');
+	dome.update({'build-what': html});
+	updateBuildingBuildInfo();
+}
+
+function updateBuildingBuildInfo() {
+	const buildingTypeId = getBuildWhat();
+	const html = getLocation().getBuildDescription(buildingTypeId);
+	dome.update({'build-description': html});
 }
 
 
